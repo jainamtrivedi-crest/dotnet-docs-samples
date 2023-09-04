@@ -26,7 +26,7 @@ namespace GoogleCloudSamples
         public UpdateStoredInfoTypesTests(DlpTestFixture fixture) => _fixture = fixture;
 
         [Fact]
-        public void TestUpdate()
+        public async void TestUpdate()
         {
             Random random = new Random();
             // Create the bucket for creating stored infoType.
@@ -65,7 +65,12 @@ namespace GoogleCloudSamples
             {
                 // Delete the created buckets.
                 storage.DeleteBucket(bucketOutput.Name);
-                storage.DeleteBucket(bucket.Name, new DeleteBucketOptions { DeleteObjects = true });
+                var objects = storage.ListObjects(bucket.Name);
+                foreach (var ob in objects)
+                {
+                    await storage.DeleteObjectAsync(bucket.Name, ob.Name);
+                }
+                await storage.DeleteBucketAsync(bucket.Name);
             }
         }
     }
